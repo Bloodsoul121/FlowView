@@ -2,10 +2,12 @@ package com.example.bloodsoul.flowingview;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import com.example.bloodsoul.flowingview.flow.ContainerView;
@@ -16,7 +18,7 @@ public class FlowActivity
 {
 
     private ContainerView containerView;
-    
+
     private Button        mBtn;
 
     @Override
@@ -24,13 +26,17 @@ public class FlowActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flow);
 
+        Log.i("FlowActivity", "start --> " + AnimationUtils.currentAnimationTimeMillis());
+
         mBtn = (Button) findViewById(R.id.btn);
 
         containerView = (ContainerView) findViewById(R.id.floatingView);
-        ViewGroup.LayoutParams params = containerView.getLayoutParams();
-        params.width = getMetricsWidth(this)* 7/5;
-        containerView.setLayoutParams(params);
+//        ViewGroup.LayoutParams params = containerView.getLayoutParams();
+//        params.width = getMetricsWidth(this)* 7/5;
+//        containerView.setLayoutParams(params);
         containerView.setDrawer(new PreferenceFloatingDrawer(this));
+
+        Log.i("FlowActivity", "end --> " + AnimationUtils.currentAnimationTimeMillis());
     }
 
     @Override

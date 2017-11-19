@@ -325,8 +325,7 @@ public class CircleHolder implements IBaseHolder {
         }
         isNowBigCircle = flag;
         animClick();
-        for (ThirdCircle circle:
-                thirdCircles) {
+        for (ThirdCircle circle: thirdCircles) {
             thirdSweepAnimStart(circle);
         }
     }

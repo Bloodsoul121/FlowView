@@ -20,39 +20,52 @@ public class ContainerView
         extends SurfaceView
         implements SurfaceHolder.Callback {
 
-    static final String TAG = ContainerView.class.getSimpleName();
+    private static final String TAG = "ContainerView";
+
     private DrawThread mDrawThread;
+
     private BaseDrawer mDrawer;
+
+    private BaseDrawer preDrawer, curDrawer;
+
+    private float curDrawerAlpha = 0.5f;
+
+    private int mWidth, mHeight;
 
     public ContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    private BaseDrawer preDrawer, curDrawer;
-    private float curDrawerAlpha = 0.5f;
-    private int mWidth, mHeight;
-
     private void init(Context context) {
         curDrawerAlpha = 0f;
         mDrawThread = new DrawThread();
         final SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
-        setZOrderOnTop(true);
-        getHolder().setFormat(PixelFormat.TRANSLUCENT);
-
+        setZOrderOnTop(true); // 置于顶层
+        getHolder().setFormat(PixelFormat.TRANSLUCENT); // 背景半透明
     }
 
     /**
      * 暂停绘制
-     * @param stop
      */
     public void setDrawerStop(boolean stop) {
         mDrawer.setStop(stop);
     }
 
+    // 开启线程, 绘制
     public void start(){
         mDrawThread.start();
+    }
+
+    public void setDrawer(BaseDrawer drawer) {
+        if (drawer == null) {
+            return;
+        }
+        if (drawer != curDrawer) {
+//            curDrawer = drawer;
+            initDrawer(drawer);
+        }
     }
 
     private void initDrawer(BaseDrawer baseDrawer) {
@@ -69,16 +82,6 @@ public class ContainerView
         invalidate();
     }
 
-    public void setDrawer(BaseDrawer drawer) {
-        if (drawer == null) {
-            return;
-        }
-        if (drawer != curDrawer) {
-            curDrawer = drawer;
-            initDrawer(drawer);
-        }
-    }
-
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -90,7 +93,8 @@ public class ContainerView
     public void updateDrawerSize(int w, int h) {
         if (w == 0 || h == 0) {
             return;
-        }// 必须加锁，因为在DrawThread.drawSurface的时候调用的是各种Drawer的绘制方法
+        }
+        // 必须加锁，因为在DrawThread.drawSurface的时候调用的是各种Drawer的绘制方法
         // 绘制的时候会遍历内部的各种holder
         if (this.curDrawer != null) {
             synchronized (curDrawer) {
@@ -182,8 +186,7 @@ public class ContainerView
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-    }
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -247,7 +250,6 @@ public class ContainerView
                     if (canvas != null) {
                         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                         // Update graphics.
-
                         drawSurface(canvas);
                         // All done!
                         mSurface.unlockCanvasAndPost(canvas);
